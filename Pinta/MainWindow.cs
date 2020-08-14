@@ -223,6 +223,30 @@ namespace Pinta
 		[GLib.ConnectBefore]
 		private void MainWindow_KeyPressEvent (object o, KeyPressEventArgs e)
 		{
+			// Switch the active tab to the next/previous one when Ctrl(+Shift)+Tab is pressed.
+			if ((e.Event.Key == Gdk.Key.Tab || e.Event.Key == Gdk.Key.ISO_Left_Tab) &&
+			   (e.Event.State.FilterModifierKeys () & Gdk.ModifierType.ControlMask) == Gdk.ModifierType.ControlMask &&
+			   DockNotebookManager.ActiveTab != null) {
+				var maxIndex = DockNotebookManager.AllTabs.Count () - 1;
+
+				if (maxIndex > 0) {
+					var currentIndex = DockNotebookManager.AllTabs.ToList ().IndexOf (DockNotebookManager.ActiveTab);
+
+					if ((e.Event.State.FilterModifierKeys () & Gdk.ModifierType.ShiftMask) != Gdk.ModifierType.ShiftMask) {
+						if (currentIndex < maxIndex)
+							DockNotebookManager.ActiveTab = DockNotebookManager.AllTabs.ElementAt (currentIndex + 1);
+						else
+							DockNotebookManager.ActiveTab = DockNotebookManager.AllTabs.ElementAt (0);
+					} else {
+						if (currentIndex > 0)
+							DockNotebookManager.ActiveTab = DockNotebookManager.AllTabs.ElementAt (currentIndex - 1);
+						else
+							DockNotebookManager.ActiveTab = DockNotebookManager.AllTabs.ElementAt (maxIndex);
+					}
+					return;
+				}
+			}
+
             // Give the widget that has focus a first shot at handling the event.
             // Otherwise, key presses may be intercepted by shortcuts for menu items.
             if (SendToFocusWidget (e, e.Event))
