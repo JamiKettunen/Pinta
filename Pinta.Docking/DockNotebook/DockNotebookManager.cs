@@ -70,6 +70,10 @@ namespace Pinta.Docking.DockNotebook
             get {
                 return ActiveNotebook == null ? null : ActiveNotebook.CurrentTab;
             }
+            set {
+                if (ActiveNotebook != null)
+                    ActiveNotebook.CurrentTab = value;
+            }
         }
 
         public static bool TabStripVisible {
